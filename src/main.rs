@@ -1,4 +1,4 @@
-use common::game::{Game, GameInstance};
+use common::game::Game;
 use clap::Parser;
 use games::*;
 
@@ -11,19 +11,16 @@ struct Args {
 	game: String
 }
 
-fn main() -> Result<(), ()> {
+fn main() {
 	let mut found_game: Option<Box<dyn Game>> = None;
 	let cli = Args::parse();
-	let snake = snake::get_game_instance();
-	{
-		let games: [GameInstance; 1] = [snake];
+	let games = [snake::get_game_instance(), pong::get_game_instance()];
 
-		for game_instance in games {
-			let game = game_instance.0;
-			let name = game_instance.1;
-			if name == cli.game {
-				found_game = Some(game);
-			}
+	for game_instance in games {
+		let game = game_instance.0;
+		let name = game_instance.1;
+		if name == cli.game {
+			found_game = Some(game);
 		}
 	}
 
@@ -31,7 +28,6 @@ fn main() -> Result<(), ()> {
 		game.run();
 	} else {
 		println!("No such game: \"{}\"", cli.game);
-		return Err(());
+		std::process::exit(1);
 	}
-	Ok(())
 }

@@ -29,6 +29,11 @@ pub fn repeat_str(original_str: &str, num: u16) -> String {
 	return new_str
 }
 
+pub fn write_text(text: &str, bounds: (u16, u16), term_size: (u16, u16)) {
+	let coords = (bounds.0 as i16 / 2 - (text.len() as i16 / 2) + 1, bounds.1 as i16 + 3);
+	print_text_at(&text, coords, bounds, term_size);
+}
+
 pub fn draw_border(bounds: (u16, u16), term_size: (u16, u16)) {
 	let (w, h) = bounds;
 	// Draw corners

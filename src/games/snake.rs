@@ -42,19 +42,18 @@ fn write_screen(game_state: &GameState) {
 	draw_border(game_state.bounds, term_size);
 	draw_snakes(&game_state.bodies, game_state.bounds, term_size);
 	draw_food(&game_state.food_locations, game_state.bounds, term_size);
-	write_text(&game_state, game_state.bounds, term_size);
+	write_game_text(&game_state, game_state.bounds, term_size);
 	println!("{}", termion::cursor::Goto(1, term_size.1-1))
 }
 
-fn write_text(game_state: &GameState, bounds: (u16, u16), term_size: (u16, u16)) {
+fn write_game_text(game_state: &GameState, bounds: (u16, u16), term_size: (u16, u16)) {
 	let text: String;
 	if game_state.finished {
 		text = format!("Game over, score: {}, press any key to continue", game_state.score);
 	} else {
 		text = format!("Score: {}", game_state.score);
 	}
-	let coords = (bounds.0 as i16 / 2 - (text.len() as i16 / 2) + 1, bounds.1 as i16 + 3);
-	print_text_at(&text, coords, bounds, term_size);
+	write_text(&text, bounds, term_size);
 }
 
 fn update_state(game_state: &mut GameState) {
