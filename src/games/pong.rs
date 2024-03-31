@@ -56,8 +56,8 @@ fn draw_paddles(state: &GameState, term_size: (u16, u16)) {
 fn write_game_text(game_state: &GameState, term_size: (u16, u16)) {
 	let text: String;
 	if game_state.finished {
-		let winner = if game_state.left_paddle.score > game_state.right_paddle.score {"Your"} else {"Computer's"};
-		text = format!("{} win, score: {} - {}, press any key to continue", winner, game_state.left_paddle.score, game_state.right_paddle.score);
+		let win_text = if game_state.left_paddle.score > game_state.right_paddle.score {"You win"} else {"Computer wins"};
+		text = format!("{}, score: {} - {}, press any key to continue", win_text, game_state.left_paddle.score, game_state.right_paddle.score);
 	} else {
 		text = format!("Score: {} - {}", game_state.left_paddle.score, game_state.right_paddle.score);
 	}
@@ -159,7 +159,7 @@ fn update_state(state: &mut GameState) {
 fn handle_input(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<Mutex<GameState>> {
 	{
 		let mut state = locked_state.lock().unwrap();
-		match input {
+		match input.to_ascii_lowercase() {
 			'w' => state.left_paddle.direction = VerticalDirection::Up,
 			's' => state.left_paddle.direction = VerticalDirection::Down,
 			_ => {}

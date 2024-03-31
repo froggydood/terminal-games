@@ -137,7 +137,7 @@ fn handle_input(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<Mutex<G
 	{
 		let lock = locked_state.lock();
 		let mut state = lock.unwrap();
-		match input {
+		match input.to_ascii_lowercase() {
 			'w' => {if state.head_direction != Direction::Down {state.head_direction = Direction::Up;}},
 			'a' => {if state.head_direction != Direction::Right {state.head_direction = Direction::Left;}},
 			's' => {if state.head_direction != Direction::Up {state.head_direction = Direction::Down;}},
