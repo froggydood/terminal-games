@@ -17,7 +17,8 @@ struct GameState {
 	food_locations: Vec<(u16, u16)>,
 	bounds: (u16, u16),
 	finished: bool,
-	score: u32
+	score: u32,
+	inputs_to_handle: Vec<char>
 }
 
 fn draw_snakes(bodies: &Vec<(u16, u16)>, bounds: (u16, u16), term_size: (u16, u16)) {
@@ -129,23 +130,29 @@ fn get_initial_state() -> GameState {
 		bounds: bounds,
 		food_locations: vec![generate_new_food(bounds, &vec![(1,1)])],
 		finished: false,
-		score: 0
+		score: 0,
+		inputs_to_handle: vec![]
 	}
 }
 
-fn handle_input(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<Mutex<GameState>> {
+fn handle_input(state: &mut GameState) {
+	if state.inputs_to_handle.len() == 0 {return};
+	match state.inputs_to_handle[0].to_ascii_lowercase() {
+		'w' => {if state.head_direction != Direction::Down {state.head_direction = Direction::Up;}},
+		'a' => {if state.head_direction != Direction::Right {state.head_direction = Direction::Left;}},
+		's' => {if state.head_direction != Direction::Up {state.head_direction = Direction::Down;}},
+		'd' => {if state.head_direction != Direction::Left {state.head_direction = Direction::Right}},
+		_ => {}
+	};
+	state.inputs_to_handle.remove(0);
+}
+
+fn add_input_to_handle(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<Mutex<GameState>> {
 	{
-		let lock = locked_state.lock();
-		let mut state = lock.unwrap();
-		match input.to_ascii_lowercase() {
-			'w' => {if state.head_direction != Direction::Down {state.head_direction = Direction::Up;}},
-			'a' => {if state.head_direction != Direction::Right {state.head_direction = Direction::Left;}},
-			's' => {if state.head_direction != Direction::Up {state.head_direction = Direction::Down;}},
-			'd' => {if state.head_direction != Direction::Left {state.head_direction = Direction::Right}},
-			_ => {}
-		};
+		let mut state = locked_state.lock().unwrap();
+		state.inputs_to_handle.push(input);
 	}
-	locked_state
+	locked_state	
 }
 
 pub struct Snake {}
@@ -158,7 +165,7 @@ impl<'a> Game<'a> for Snake {
 			loop {
 				let char = term.read_char().unwrap();
 				if state_clone.lock().unwrap().finished {break;}
-				state_clone = handle_input(state_clone, char);
+				state_clone = add_input_to_handle(state_clone, char);
 			}
 		});
 
@@ -167,6 +174,7 @@ impl<'a> Game<'a> for Snake {
 			{
 				let mut state = locked_state.lock().unwrap();
 				let state_ref = &mut state;
+				handle_input(state_ref);
 				check_on_food(state_ref);
 				update_state(state_ref);
 				write_screen(state_ref);
