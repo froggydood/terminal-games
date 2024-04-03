@@ -33,7 +33,7 @@ fn draw_food(food: &Vec<(u16, u16)>, bounds: (u16, u16), term_size: (u16, u16)) 
 	let body_char: &str = "█";
 	for n in 0..food.len() {
 		let (x, y) = food[n];
-		print_text_at_with_color(body_char, (x+1, y+1), &termion::color::Red, bounds, term_size);
+		print_text_at_with_color(body_char, ((x+1) as i16, (y+1) as i16), &termion::color::Red, bounds, term_size);
 	}	
 }
 
@@ -44,7 +44,7 @@ fn write_screen(game_state: &GameState) {
 	draw_snakes(&game_state.bodies, game_state.bounds, term_size);
 	draw_food(&game_state.food_locations, game_state.bounds, term_size);
 	write_game_text(&game_state, game_state.bounds, term_size);
-	println!("{}", termion::cursor::Goto(1, term_size.1-1))
+	cursor_to_end(term_size.1);
 }
 
 fn write_game_text(game_state: &GameState, bounds: (u16, u16), term_size: (u16, u16)) {
@@ -157,7 +157,7 @@ fn add_input_to_handle(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<
 
 pub struct Snake {}
 impl<'a> Game<'a> for Snake {
-	fn run(&self) {
+	fn run(&self) -> Option<i32>{
 		let locked_state = Arc::from(Mutex::from(get_initial_state()));
 		let mut state_clone = locked_state.clone();
 		let input_handler = thread::spawn(move || {
@@ -187,12 +187,15 @@ impl<'a> Game<'a> for Snake {
 			}
 			sleep(Duration::from_millis(sleep_ms.floor() as u64));
 		}
+		let score;
 		{
 			let mut state = locked_state.lock().unwrap();
 			let state_ref = &mut state;
 			write_screen(state_ref);
+			score = state.score;
 		}
 		let _ = input_handler.join();
+		Some(score as i32)
 	}
 }
 

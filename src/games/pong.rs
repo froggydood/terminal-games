@@ -1,4 +1,4 @@
-use std::{sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
+use std::{process::Output, sync::{Arc, Mutex}, thread::{self, sleep}, time::Duration};
 
 use crate::common::{game::*, screen::*};
 
@@ -174,7 +174,7 @@ fn is_over(state: &GameState) -> bool {
 
 pub struct Pong{}
 impl<'a> Game<'a> for Pong {
-	fn run(&self) {
+	fn run(&self) -> Option<i32> {
 		let locked_state = Arc::from(Mutex::from(get_initial_state()));
 		let mut state_clone = locked_state.clone();
 		let input_handler = thread::spawn(move || {
@@ -206,6 +206,7 @@ impl<'a> Game<'a> for Pong {
 			write_screen(state_ref);
 		}
 		let _ = input_handler.join();
+		None
 	}
 }
 
