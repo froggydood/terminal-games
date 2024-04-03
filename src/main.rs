@@ -1,4 +1,4 @@
-use common::{game::{Game, GameInstance}, screen::{draw_menu, MenuItem}};
+use common::{game::Game, screen::menu::*};
 use clap::Parser;
 use games::*;
 
@@ -14,7 +14,10 @@ struct Args {
 fn main() {
 	let mut found_game: Option<Box<dyn Game>> = None;
 	let cli = Args::parse();
-	let games = [snake::get_game_instance(), pong::get_game_instance()];
+	let games = [
+		snake::get_game_instance(),
+		pong::get_game_instance(),
+	];
 	let selected_game_name: String;
 
 	if let Some(game_name) = cli.game {
