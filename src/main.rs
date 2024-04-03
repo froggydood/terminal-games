@@ -1,4 +1,6 @@
-use common::{game::Game, screen::menu::*};
+use std::{thread::sleep, time::Duration};
+
+use common::{game::{Game, GameInstance, Score, WinState}, screen::menu::*};
 use clap::Parser;
 use games::*;
 
@@ -11,36 +13,58 @@ struct Args {
 	game: Option<String>
 }
 
+fn select_game(games: &[GameInstance]) -> String {
+	let menu_items = games.iter().map(|(_, label)| {
+		MenuItem::new(&label, &label)
+	}).collect::<Vec<MenuItem>>();
+	let selected_name = draw_menu(&menu_items, "Select a game");
+	selected_name
+}
+
 fn main() {
-	let mut found_game: Option<Box<dyn Game>> = None;
 	let cli = Args::parse();
 	let games = [
 		snake::get_game_instance(),
 		pong::get_game_instance(),
 	];
-	let selected_game_name: String;
 
-	if let Some(game_name) = cli.game {
-		selected_game_name = game_name.to_owned();
-	} else {
-		let menu_items = games.iter().map(|(_, label)| {
-			MenuItem::new(&label, &label)
-		}).collect::<Vec<MenuItem>>();
-		selected_game_name = draw_menu(&menu_items, &"Pick a game");
-	}
-
-	for game_instance in games {
-		let game = game_instance.0;
-		let name = game_instance.1;
-		if name == selected_game_name {
-			found_game = Some(game);
-		}
-	}
+	'outer: loop {
+		let selected_game_name: String;
 	
-	if let Some(game) = found_game {
-		game.run();
-	} else {
-		println!("Couldn't find game");
-		std::process::exit(1);
+		if let Some(game_name) = &cli.game {
+			selected_game_name = game_name.to_owned();
+		} else {
+			selected_game_name = select_game(&games);
+		}
+
+		let mut found_game: Option<&Box<dyn Game>> = None;
+		for game_instance in &games {
+			let game = &game_instance.0;
+			let name = game_instance.1;
+			if name == selected_game_name {
+				found_game = Some(&game);
+			}
+		}
+		
+		if let Some(game) = found_game {
+			let menu_items: Vec<MenuItem> = vec![
+				MenuItem::new("Play again", "again"),
+				MenuItem::new("Play a different game", "different_game"),
+				MenuItem::new("Quit", "quit")
+			];
+			'inner: loop {
+				let game_return = game.run();
+				let response = draw_menu(&menu_items, &game_return.get_end_text());
+				println!("Res: {}", response);
+				match response.as_str() {
+					"again" => {},
+					"different_game" => break 'inner,
+					_ => break 'outer,
+				}
+			}
+		} else {
+			println!("Couldn't find game");
+			std::process::exit(1);
+		}
 	}
 }

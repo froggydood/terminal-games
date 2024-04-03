@@ -190,9 +190,10 @@ fn is_over(state: &GameState) -> bool {
 
 pub struct Pong{}
 impl<'a> Game<'a> for Pong {
-	fn run(&self) -> Option<i32> {
+	fn run(&self) -> GameReturn {
 		let locked_state = Arc::from(Mutex::from(get_initial_state()));
 		let mut state_clone = locked_state.clone();
+		let mut game_return = GameReturn::default();
 		let input_handler = thread::spawn(move || {
 			let term = console::Term::stdout();
 			loop {
@@ -218,11 +219,15 @@ impl<'a> Game<'a> for Pong {
 		}
 		{
 			let mut state = locked_state.lock().unwrap();
+			game_return = GameReturn {
+				score: Score::TwoPlayer(state.left_paddle.score as f32, state.right_paddle.score as f32),
+    			win_state: if state.left_paddle.score > state.right_paddle.score {WinState::Win} else {WinState::Lose},
+			};
 			let state_ref = &mut state;
 			write_screen(state_ref);
 		}
 		let _ = input_handler.join();
-		None
+		game_return
 	}
 }
 
