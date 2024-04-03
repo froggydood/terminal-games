@@ -174,9 +174,10 @@ fn add_input_to_handle(locked_state: Arc<Mutex<GameState>>, input: char) -> Arc<
 
 pub struct Snake {}
 impl<'a> Game<'a> for Snake {
-	fn run(&self) -> Option<i32>{
+	fn run(&self) -> GameReturn {
 		let locked_state = Arc::from(Mutex::from(get_initial_state()));
 		let mut state_clone = locked_state.clone();
+		let mut game_return = GameReturn::default();
 		let input_handler = thread::spawn(move || {
 			let term = console::Term::stdout();
 			loop {
@@ -204,15 +205,17 @@ impl<'a> Game<'a> for Snake {
 			}
 			sleep(Duration::from_millis(sleep_ms.floor() as u64));
 		}
-		let score;
 		{
 			let mut state = locked_state.lock().unwrap();
 			let state_ref = &mut state;
+			game_return = GameReturn {
+				score: Score::SinglePlayer(state_ref.score as f32),
+				win_state: WinState::Lose
+			};
 			write_screen(state_ref);
-			score = state.score;
 		}
 		let _ = input_handler.join();
-		Some(score as i32)
+		game_return
 	}
 }
 
