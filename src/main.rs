@@ -1,6 +1,4 @@
-use std::{thread::sleep, time::Duration};
-
-use common::{game::{Game, GameInstance, Score, WinState}, screen::menu::*};
+use common::{game::{Game, GameInstance}, screen::menu::*};
 use clap::Parser;
 use games::*;
 
@@ -26,6 +24,7 @@ fn main() {
 	let games = [
 		snake::get_game_instance(),
 		pong::get_game_instance(),
+		quit::get_game_instance()
 	];
 
 	'outer: loop {
@@ -55,7 +54,6 @@ fn main() {
 			'inner: loop {
 				let game_return = game.run();
 				let response = draw_menu(&menu_items, &game_return.get_end_text());
-				println!("Res: {}", response);
 				match response.as_str() {
 					"again" => {},
 					"different_game" => break 'inner,

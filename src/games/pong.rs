@@ -193,7 +193,7 @@ impl<'a> Game<'a> for Pong {
 	fn run(&self) -> GameReturn {
 		let locked_state = Arc::from(Mutex::from(get_initial_state()));
 		let mut state_clone = locked_state.clone();
-		let mut game_return = GameReturn::default();
+		let game_return: GameReturn;
 		let input_handler = thread::spawn(move || {
 			let term = console::Term::stdout();
 			loop {

@@ -23,7 +23,7 @@ pub fn print_at_with_cols(text: &str, coords: (u16, u16), bg: Option<&dyn Color>
 		bg_col = col;
 	}
 	let mut fg_col: &dyn termion::color::Color = &termion::color::Reset;
-	if let Some(col) = bg {
+	if let Some(col) = fg {
 		fg_col = col;
 	}
 	println!("{}{}{}{}{}{}", Goto(coords.0, coords.1), Bg(bg_col), Fg(fg_col), text, Bg(Reset), Fg(Reset));

@@ -44,8 +44,8 @@ fn draw_food(state: &GameState) {
 				state.offset.0 + x - 1,
 				state.offset.1 + y - 1
 			),
-			Some(&termion::color::Red),
-			None
+			None,
+			Some(&termion::color::Red)
 		);
 	}	
 }
@@ -55,8 +55,8 @@ fn write_screen(game_state: &GameState) {
 	BoxPrint::new((game_state.bounds.0 + 2, game_state.bounds.1 + 2))
 		.at_coords((game_state.offset.0 - 1, game_state.offset.1 - 1))
 		.print();
-	draw_snakes(game_state);
 	draw_food(game_state);
+	draw_snakes(game_state);
 	write_game_text(&game_state);
 	cursor_to_end();
 }
