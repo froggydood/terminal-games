@@ -22,6 +22,7 @@ fn select_game(games: &[GameInstance]) -> String {
 fn main() {
 	let cli = Args::parse();
 	let games = [
+		render_test::get_game_instance(),
 		snake::get_game_instance(),
 		pong::get_game_instance(),
 		quit::get_game_instance()

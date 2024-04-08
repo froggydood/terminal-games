@@ -38,6 +38,7 @@ pub fn clear_screen() {
 	for i in 1..=(term_size.1-1) {
 		println!("{}{}", termion::cursor::Goto(1, i), termion::clear::CurrentLine);
 	}
+	print!("{}{}", termion::cursor::Goto(term_size.0, term_size.1), termion::clear::BeforeCursor)
 }
 
 pub fn cursor_to_end() {

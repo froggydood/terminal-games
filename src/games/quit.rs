@@ -7,5 +7,5 @@ impl<'a> Game<'a> for Quit {
 	}
 }
 pub fn get_game_instance<'a>() -> GameInstance<'a> {
-	(Box::new(Quit {}), "quit")
+	(Box::new(Quit {}), "Quit")
 }
