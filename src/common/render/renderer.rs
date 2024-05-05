@@ -2,6 +2,7 @@ use std::borrow::Borrow;
 use termion::cursor::Goto;
 use termion::*;
 use termion::color::*;
+use super::object::TriangleFace;
 use super::scene::*;
 use rand::Rng;
 
@@ -90,5 +91,23 @@ impl Renderer for TerminalRenderer {
 			text = format!("{}{}{}", text, Fg(col), "#");
 		}
 		print!("{}{}", Goto(1, 1), text)
+	}
+}
+
+struct BarycentricCoords {
+	s: f32,
+	t: f32
+}
+
+fn get_barycentric_coords(point: (f32, f32)) -> BarycentricCoords {
+	let a = triangle.vertices[0];
+	let b = triangle.vertices[1];
+	let c = triangle.vertices[2];
+
+	let v0 = (a);
+	
+	BarycentricCoords {
+		s: 0,
+		t: 0
 	}
 }

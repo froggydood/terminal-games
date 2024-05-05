@@ -100,9 +100,7 @@ fn check_on_food(state: &mut GameState) {
 	}
 	if add {
 		let last = state.bodies[0];
-		state.bodies.reverse();
-		state.bodies.append(&mut vec![last.clone()]);
-		state.bodies.reverse();
+		state.bodies.insert(0, last);
 		state.food_locations = vec![generate_new_food(state.bounds, &state.bodies)];
 		state.score += 1;
 	}
